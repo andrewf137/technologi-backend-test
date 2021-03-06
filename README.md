@@ -1,2 +1,2 @@
-# technologi_backend_test
+# technologi-backend-test
 Technologi backend test
