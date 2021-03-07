@@ -1,0 +1,17 @@
+{
+    "name": "andrewf137/technologi-backend-test",
+    "description": "Technologi backend test",
+    "type": "project",
+    "version": "1.1.1",
+    "homepage": "https://github.com/andrewf137/technologi-backend-test",
+    "time": "2021-03-06",
+    "license": "GPL-3.0-only / GPL-3.0-or-later",
+    "require": {
+        "php": ">=7.0.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "RecursiveFileStructure\\": ["src/", "tests/"]
+        }
+    }
+}
