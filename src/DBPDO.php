@@ -25,12 +25,12 @@ use PDOStatement;
 class DBPDO
 {
     /** @var PDO */
-	public $pdo;
+    public $pdo;
 
-	function __construct()
+    function __construct()
     {
-		$this->connect();
-	}
+        $this->connect();
+    }
 
     /**
      * @param $query
@@ -38,35 +38,35 @@ class DBPDO
      */
     function prep_query($query)
     {
-		return $this->pdo->prepare($query);
-	}
+        return $this->pdo->prepare($query);
+    }
 
     /**
      * @return bool
      */
     function connect(): bool
     {
-	    $params = require 'config' . DIRECTORY_SEPARATOR . 'config.php';
+        $params = require 'config' . DIRECTORY_SEPARATOR . 'config.php';
 
-		if(!$this->pdo){
+        if(!$this->pdo){
 
-			$dsn      = 'mysql:dbname=' . $params['DATABASE_NAME'] .
+            $dsn      = 'mysql:dbname=' . $params['DATABASE_NAME'] .
                         ';host=' . $params['DATABASE_HOST'] .
                         ';charset=' . $params['DATABASE_CHARSET'];
-			$user     = $params['DATABASE_USER'];
-			$password = $params['DATABASE_PASS'];
+            $user     = $params['DATABASE_USER'];
+            $password = $params['DATABASE_PASS'];
 
-			try {
-				$this->pdo = new PDO($dsn, $user, $password, [PDO::ATTR_PERSISTENT => true]);
-				return true;
-			} catch (PDOException $e) {
-				die($e->getMessage());
-			}
-		}else{
-			$this->pdo->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING );
-			return true;
-		}
-	}
+            try {
+                $this->pdo = new PDO($dsn, $user, $password, [PDO::ATTR_PERSISTENT => true]);
+                return true;
+            } catch (PDOException $e) {
+                die($e->getMessage());
+            }
+        }else{
+            $this->pdo->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING );
+            return true;
+        }
+    }
 
     /**
      * @param $query
@@ -75,18 +75,18 @@ class DBPDO
      */
     function execute($query, $values = null)
     {
-		if (null === $values) {
-			$values = [];
-		} elseif (!is_array($values)) {
-			$values = [$values];
-		}
+        if (null === $values) {
+            $values = [];
+        } elseif (!is_array($values)) {
+            $values = [$values];
+        }
 
-		/** @var PDOStatement|bool $stmt */
-		$stmt = $this->prep_query($query);
-		$stmt->execute($values);
+        /** @var PDOStatement|bool $stmt */
+        $stmt = $this->prep_query($query);
+        $stmt->execute($values);
 
-		return $stmt;
-	}
+        return $stmt;
+    }
 
     /**
      * @param string $query
@@ -95,17 +95,17 @@ class DBPDO
      */
     function fetch(string $query, $values = null)
     {
-		if (null === $values){
-			$values = [];
-		} elseif (!is_array($values)) {
-			$values = [$values];
-		}
+        if (null === $values){
+            $values = [];
+        } elseif (!is_array($values)) {
+            $values = [$values];
+        }
 
-		/** @var PDOStatement|bool $stmt */
-		$stmt = $this->execute($query, $values);
+        /** @var PDOStatement|bool $stmt */
+        $stmt = $this->execute($query, $values);
 
-		return $stmt->fetch(PDO::FETCH_ASSOC);
-	}
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
 
     /**
      * @param string $query
@@ -115,35 +115,35 @@ class DBPDO
      */
     function fetchAll(string $query, $values = null, ?string $key = null): array
     {
-		if (null === $values){
-			$values = [];
-		} elseif (!is_array($values)) {
-			$values = [$values];
-		}
+        if (null === $values){
+            $values = [];
+        } elseif (!is_array($values)) {
+            $values = [$values];
+        }
 
         /** @var PDOStatement|bool $stmt */
-		$stmt = $this->execute($query, $values);
-		/** @var array $results */
-		$results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $stmt = $this->execute($query, $values);
+        /** @var array $results */
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-		// Allows the user to retrieve results using a
-		// column from the results as a key for the array
-		if (null !== $key && !empty($results) && $results[0][$key]) {
-			$keyed_results = [];
+        // Allows the user to retrieve results using a
+        // column from the results as a key for the array
+        if (null !== $key && !empty($results) && $results[0][$key]) {
+            $keyed_results = [];
             foreach($results as $result){
-				$keyed_results[$result[$key]] = $result;
-			}
-			$results = $keyed_results;
-		}
+                $keyed_results[$result[$key]] = $result;
+            }
+            $results = $keyed_results;
+        }
 
-		return $results;
-	}
+        return $results;
+    }
 
     /**
      * @return string
      */
     function lastInsertId(): string
     {
-		return $this->pdo->lastInsertId();
-	}
+        return $this->pdo->lastInsertId();
+    }
 }
