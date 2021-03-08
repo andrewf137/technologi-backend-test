@@ -7,6 +7,7 @@
     git clone https://github.com/andrewf137/technologi-backend-test.git
     ```
 2. "cd" to project folder.
+3. Run `composer install`.
 3. Edit `<project-folder>/config/config.php` file.
 4. Run `php init.php`.  
    This will:
