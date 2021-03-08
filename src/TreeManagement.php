@@ -100,7 +100,7 @@ class TreeManagement
 
             $query = "SELECT group_concat(n.label ORDER BY n.id ASC separator '\\\') AS path
                         FROM nodes n
-                       INNER JOIN relations r ON n.id = r.ancestor
+                        JOIN relations r ON n.id = r.ancestor
                        WHERE r.descendant IN (SELECT id FROM nodes WHERE label LIKE ?)
                        GROUP BY r.descendant
                        ORDER BY r.descendant ASC, n.id ASC";
