@@ -20,7 +20,7 @@ namespace RecursiveFileStructure;
  */
 class TreeManagement
 {
-        private $list = <<<TXT
+    private $list = <<<TXT
 C:
     Documents
         Images
