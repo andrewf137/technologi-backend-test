@@ -14,8 +14,6 @@ require_once(__DIR__. DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'au
 
 session_start();
 
-$displayableResult = '';
-
 $treeManagement = new \RecursiveFileStructure\TreeManagement();
 
 if (isset($_POST['submit']) && $_POST['submit'] === 'Submit') {
