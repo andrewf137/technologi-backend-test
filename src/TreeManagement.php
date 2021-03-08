@@ -53,7 +53,7 @@ TXT;
         /** @var string $indentation */
         $indentation = '    ';
 
-        // We'll keep an array of ancestors of each node (line)
+        // We'll keep an array of ancestors of each node (i.e. line)
         /** @var array $path */
         $path = [];
 
@@ -100,10 +100,10 @@ TXT;
     {
         $dbpdo = new DBPDO();
 
-        // The first next query requires disabling MySQL "ONLY_FULL_GROUP_BY" attribute.
-        $dbpdo->execute("SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))");
-
         if (null !== $searchString) {
+            // This query requires disabling MySQL "ONLY_FULL_GROUP_BY" attribute.
+            $dbpdo->execute("SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))");
+
             $query = "SELECT group_concat(n.label ORDER BY n.id ASC separator '\\\') AS path
                         FROM nodes n
                        INNER JOIN relations r ON n.id = r.ancestor
@@ -124,29 +124,6 @@ TXT;
         }
 
         return !empty($results) ? array_keys($results) : [];
-    }
-
-    /**
-     * @desc query that returns the whole tree in "xxx/yyy/zzz" format
-     * @param string|null $string
-     * @return array
-     */
-    public function outputFullTree(string $string = null): array
-    {
-        $dbpdo = new DBPDO();
-
-        /** @var string $query */
-        $query = 'SELECT group_concat(n.label ORDER BY r2.depth desc separator \'->\') AS path
-                    FROM relations r1
-                    JOIN relations r2 ON (r2.descendant = r1.descendant)
-                    JOIN nodes n ON (n.id = r2.ancestor)
-                   WHERE r1.ancestor = 1
-                     AND r1.descendant != r1.ancestor
-                   GROUP BY r1.descendant';
-
-        /** @var array $results */
-        $results = $dbpdo->fetchAll($query, null, 'path');
-        return array_keys($results);
     }
 
     /**
@@ -204,25 +181,5 @@ TXT;
                     WHERE `descendant` = ?';
 
         $dbpdo->execute($query, [$node, $parentNode]);
-    }
-
-    /**
-     * @desc get direct parent of a given node
-     * @param int $node
-     * @return array|bool
-     */
-    private function getParentNode(int $node)
-    {
-        $dbpdo = new DBPDO();
-
-        /** @var string $query */
-        $query = 'SELECT ancestor
-                    FROM relations
-                   WHERE descendant = ?
-                     AND depth = 1';
-
-        /** @var array $results */
-        $results = $dbpdo->fetch($query, $node);
-        return $results;
     }
 }

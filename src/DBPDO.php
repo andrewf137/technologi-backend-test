@@ -27,7 +27,8 @@ class DBPDO
     /** @var PDO */
 	public $pdo;
 
-	function __construct() {
+	function __construct()
+    {
 		$this->connect();
 	}
 
@@ -35,14 +36,16 @@ class DBPDO
      * @param $query
      * @return PDOStatement|bool
      */
-    function prep_query($query){
+    function prep_query($query)
+    {
 		return $this->pdo->prepare($query);
 	}
 
     /**
      * @return bool
      */
-    function connect(){
+    function connect(): bool
+    {
 	    $params = require 'config' . DIRECTORY_SEPARATOR . 'config.php';
 
 		if(!$this->pdo){
@@ -139,7 +142,8 @@ class DBPDO
     /**
      * @return string
      */
-    function lastInsertId(){
+    function lastInsertId(): string
+    {
 		return $this->pdo->lastInsertId();
 	}
 }
