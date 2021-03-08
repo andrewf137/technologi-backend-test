@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace RecursiveFileStructure;
 
+use RecursiveFileStructure\Exception\OpenFileException;
+
 /**
  * Class TreeManagement
  *
@@ -20,35 +22,11 @@ namespace RecursiveFileStructure;
  */
 class TreeManagement
 {
-    private $list = <<<TXT
-C:
-    Documents
-        Images
-            Image1.jpg
-            Image2.jpg
-            Image3.png
-        Works
-            Letter.doc
-        Accountant
-            Accounting.xls
-            AnnualReport.xls
-    Program Files
-        Skype
-            Skype.exe
-            Readme.txt
-        Mysql
-            Mysql.exe
-            Mysql.com
-TXT;
-
     /**
      * @desc inserts the file structure into DB
      */
     public function insertNodes(): void
     {
-        /** @var array $lines */
-        $lines = explode("\n", $this->list);
-
         // Depth of nodes will be indicated by the number of indentations each line contains
         /** @var string $indentation */
         $indentation = '    ';
@@ -57,37 +35,53 @@ TXT;
         /** @var array $path */
         $path = [];
 
-        /** @var string $line */
-        foreach ($lines as $line) {
-            // Get depth of the node
-            /** @var int $depth */
-            $depth = 0;
-            while (substr($line, 0, strlen($indentation)) === $indentation) {
-                $depth += 1;
-                $line = substr($line, strlen($indentation));
+        try {
+            /** @var false|resource $resource */
+            $resource = fopen("fileStructure.txt", "r");
+
+            if ($resource) {
+                while (($line = fgets($resource)) !== false) {
+                    // Remove trailing newline
+                    $line = rtrim($line);
+
+                    // Get depth of the node
+                    /** @var int $depth */
+                    $depth = 0;
+                    while (substr($line, 0, strlen($indentation)) === $indentation) {
+                        $depth += 1;
+                        $line = substr($line, strlen($indentation));
+                    }
+
+                    // Keep in $path only ancestors of the current node (i.e. line)
+                    while ($depth < sizeof($path)) {
+                        array_pop($path);
+                    }
+
+                    // Insert node
+                    $this->insertNode(trim($line));
+
+                    /** @var int $lastNodeId */
+                    $lastNodeId = (int)$this->lastInsertId();
+
+                    // Insert self-referencing row
+                    $this->insertRelation($lastNodeId, $lastNodeId, 0);
+
+                    // Add new level
+                    $path[$depth] = $lastNodeId;
+
+                    // Add a descendant to each of the ancestor of the current node
+                    for ($i = $depth - 1; $i >= 0; $i--) {
+                        $this->insertDescendant($lastNodeId, $path[$i]);
+                    }
+                }
+
+                fclose($resource);
+            } else {
+                $error = error_get_last();
+                throw new OpenFileException($error['message']);
             }
-
-            // Keep in $path only ancestors of the current node (i.e. line)
-            while ($depth < sizeof($path)) {
-                array_pop($path);
-            }
-
-            // Insert node
-            $this->insertNode(trim($line));
-
-            /** @var int $lastNodeId */
-            $lastNodeId = (int)$this->lastInsertId();
-
-            // Insert self-referencing row
-            $this->insertRelation($lastNodeId, $lastNodeId, 0);
-
-            // Add new level
-            $path[$depth] = $lastNodeId;
-
-            // Add a descendant to each of the ancestor of the current node
-            for ($i = $depth - 1; $i >= 0; $i--) {
-                $this->insertDescendant($lastNodeId, $path[$i]);
-            }
+        } catch (\Exception $exception) {
+            echo $exception->getMessage();
         }
     }
 

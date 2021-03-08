@@ -1,5 +1,9 @@
 # Technologi backend test
 
+## Requirements
+* PHP >= 7.0.0
+* composer
+
 ## Instructions
 
 1. Checkout project:
@@ -16,3 +20,5 @@
    * insert file structure into database
 5. `index.php` file is in the root folder of the project.  
     It contains a simple form to perform queries as requested in the test instructions.
+6. The file containing the "file structure" data is at the root of the project with name fileStructure.txt.  
+   You can update this file and then run again `php int.php` to upload its content to the database.
